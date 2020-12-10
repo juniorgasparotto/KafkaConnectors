@@ -1,0 +1,19 @@
+FROM openjdk:8
+
+ARG env=prod
+RUN echo "COPYING KAFKA DIR INSTALLATION FOR ${env} ENVIRONMENT "
+ADD https://downloads.apache.org/kafka/2.6.0/kafka_2.13-2.6.0.tgz /opt/kafka/
+COPY ./connectors /opt/kafka/connectors
+RUN echo "COPYING config for ${env} options, aka config-${env}"
+# In order to create the docker for qa and prod, change the config file to be copied
+COPY ./config-${env} /opt/kafka/bin/config/
+RUN echo "SETTING ENVIRONMENT VARIABLE FOR ${env}-publisher-squad-catalog.json"
+#ENV GOOGLE_APPLICATION_CREDENTIALS=/opt/credentials/${env}-publisher-squad-catalog.json
+ENV CLASSPATH=/opt/kafka/connectors/amazon-kinesis-kafka-connector-0.0.9-SNAPSHOT.jar
+#ENV AWS_ACCESS_KEY_ID=[AWS_ACCESS_KEY_ID]
+#ENV AWS_SECRET_KEY=[AWS_SECRET_KEY]
+#ENV AWS_SECRET_ACCESS_KEY=[AWS_SECRET_ACCESS_KEY]
+
+RUN echo "RUNNING KAFKA CONNECT STAND ALONE"
+VOLUME /offset
+CMD cd /opt/kafka/bin/ && ./connect-standalone.sh config/worker.properties config/kinesis-streams-kafka-connector.properties

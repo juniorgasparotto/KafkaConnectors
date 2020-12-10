@@ -1,0 +1,9 @@
+# kubetpl:syntax:$
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: kafka-connect-configmap
+  namespace: ns-kafka-connect
+data:
+  VAR1: 'VALUE1'

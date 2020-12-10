@@ -1,0 +1,29 @@
+# kubetpl:syntax:$
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-connect
+  labels:
+    app: kafka-connect
+  namespace: ns-kafka-connect
+spec:
+  selector:
+    matchLabels:
+      app: kafka-connect
+  template:
+    metadata:
+      labels:
+        app: kafka-connect
+    spec:
+      nodeSelector:
+        eks.amazonaws.com/nodegroup: dev-ng-api
+      containers:
+        - image: [ID].dkr.ecr.us-east-1.amazonaws.com/kafka-connect:latest
+          imagePullPolicy: Always
+          name: kafka-connect
+          envFrom:
+            - configMapRef:
+                name: kafka-connect-configmap
+            - secretRef:
+                name: kafka-connect-secret
